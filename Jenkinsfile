@@ -8,13 +8,12 @@ pipeline {
             }
         }
 
-        //stage ('Test') {
-            //steps {
-                //sh 'mvn test'
-                //junit 'target/*.xml'
-                //when 'manual'
-            //}
-        //}
+        stage ('Test') {
+            steps {
+                sh 'mvn test'
+                junit 'target/*.xml'
+                }
+        }
 
         
         
@@ -22,9 +21,23 @@ pipeline {
             steps {
                 echo "Building war file"
                 sh 'mvn package'
-                archiveArtifacts artifacts : 'target/*.war'
             }
         }
+        
+        stage ('Deploy Prerequites'){
+            steps {
+                echo "Moving the files to target machine"
+                sh 'scp -i <key_path> <build_file> <user@ip>:<Location where to move the build file>'
+            }
+        }
+
+        stage ('Deploy'){
+            steps {
+                echo "Deploy"
+                sh 'ssh -i <key_path> <user@ip>:<script to be triggered>'
+            }
+        }
+
 
     }
 }
